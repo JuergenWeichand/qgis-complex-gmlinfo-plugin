@@ -33,6 +33,8 @@ from .pygml import pygml, util
 from collections import OrderedDict
 import logging
 
+from .selectTool import SelectTool
+
 
 class ComplexGmlInfo:
     """QGIS Plugin Implementation."""
@@ -233,6 +235,17 @@ class ComplexGmlInfo:
             QMessageBox.critical(self.dlg, 'Error', u'Please activate GML layer!')
             return
 
+        self.previous_map_tool = self.iface.mapCanvas().mapTool()
+
+        if not layer.selectedFeatures():
+            tool = SelectTool(self.iface, self.show_Info)
+            self.iface.mapCanvas().setMapTool(tool)
+        else:
+            self.show_Info()
+
+    def show_Info(self):
+        layer = self.iface.activeLayer()
+
         filename = layer.dataProvider().dataSourceUri().split('|')[0]
 
         if not filename in self.cache:
@@ -263,6 +276,8 @@ class ComplexGmlInfo:
 
         self.fill_widget(self.dlg.treeWidget, features)
 
+        if self.previous_map_tool:
+            self.iface.mapCanvas().setMapTool(self.previous_map_tool)
 
     # based on http://stackoverflow.com/questions/21805047/qtreewidget-to-mirror-python-dictionary
     def fill_item(self, item, value):
