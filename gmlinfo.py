@@ -227,12 +227,12 @@ class ComplexGmlInfo:
 
         # layer must be activated
         if not layer:
-            QMessageBox.critical(self.dlg, 'Error', u'Please activate GML layer!')
+            QMessageBox.critical(self.dlg, 'Error', u'Please activate a GML layer - no layer is active!')
             return
 
         # layer must be GML
         if layer.storageType() != 'GML':
-            QMessageBox.critical(self.dlg, 'Error', u'Please activate GML layer!')
+            QMessageBox.critical(self.dlg, 'Error', u'Please activate a GML layer - the active layer is not GML!')
             return
 
         self.previous_map_tool = self.iface.mapCanvas().mapTool()
