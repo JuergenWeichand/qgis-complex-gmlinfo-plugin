@@ -185,7 +185,6 @@ class ComplexGmlInfo:
             add_to_toolbar=None,
             parent=None)
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -196,11 +195,9 @@ class ComplexGmlInfo:
         # remove the toolbar
         del self.toolbar
 
-
     def about(self):
         infoString = "<table><tr><td colspan=\"2\"><b>Complex GML Info 0.4</b></td></tr><tr><td colspan=\"2\"></td></tr><tr><td>Author:</td><td>J&uuml;rgen Weichand</td></tr><tr><td>Mail:</td><td><a href=\"mailto:juergen@weichand.de\">juergen@weichand.de</a></td></tr><tr><td>Website:</td><td><a href=\"http://www.weichand.de\">http://www.weichand.de</a></td></tr></table>"
         QMessageBox.information(self.iface.mainWindow(), "About Complex GML Info", infoString)
-
 
     def run(self):
         self.dlg.treeWidget.setHeaderHidden(True)
@@ -211,7 +208,6 @@ class ComplexGmlInfo:
         self.timer.setInterval(500)
         self.timer.start()
         self.timer.timeout.connect(self.checkUpdateFeatureInfo)
-
 
     def resetTimer(self):
         self.timer.stop()
@@ -225,7 +221,6 @@ class ComplexGmlInfo:
             self.timer.start()
 
     def displayFeatureInfo(self):
-
         layer = self.iface.activeLayer()
 
         # layer must be activated
@@ -259,11 +254,13 @@ class ComplexGmlInfo:
 
         features = OrderedDict()
         i = 0
+
         for feature in layer.selectedFeatures():
             if feature.attribute('gml_id'):
                 i+=1
                 gml_id = feature.attribute('gml_id')
                 features['Selected feature [' + str(i) +']'] = gml.getFeature(gml_id)
+
         self.fill_widget(self.dlg.treeWidget, features)
 
 
@@ -304,12 +301,9 @@ class ComplexGmlInfo:
             child.setText(0, str(value))
             item.addChild(child)
 
-
     def fill_widget(self, widget, value):
         widget.clear()
         self.fill_item(widget.invisibleRootItem(), value)
-
-
 
     # colorize attributes
     def getQColor(self, text):
@@ -320,7 +314,6 @@ class ComplexGmlInfo:
             if indicator in text.lower():
                 return QColor('darkslategray')
         return QColor('red')
-
 
     # search inside QTreeWidget
     def updateFeatureInfo(self):
