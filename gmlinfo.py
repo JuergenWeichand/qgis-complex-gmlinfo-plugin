@@ -327,8 +327,8 @@ class ComplexGmlInfo:
                 return QColor('lightgrey')
         for indicator in ['gml:id', 'localid', 'identifier', 'xlink:href', 'xlink:type', 'namespace', 'codespace']:
             if indicator in text.lower():
-                return QColor('darkslategray')
-        return QColor('red')
+                return QColor(244,134,66)
+        return QColor('green')
 
     # search inside QTreeWidget
     def updateFeatureInfo(self):
