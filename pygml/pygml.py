@@ -13,9 +13,13 @@ __copyright__ = 'Copyright 2015 Jürgen Weichand'
 
 from collections import OrderedDict
 import logging
-from xmltodict import xmltodict
-import util
+import os
+import tempfile
 import json
+
+#from extlib.pygml.xmltodict import xmltodict
+from .xmltodict import *
+
 
 class GmlException(Exception):
 
@@ -25,10 +29,18 @@ class GmlException(Exception):
     def __str__(self):
         return repr(self.message)
 
-class Dataset():
 
+def getTempfile(filename):
+    tmpdir = tempfile.gettempdir()
+    if not os.path.exists(tmpdir):
+        os.makedirs(tmpdir)
+    tmpfile = os.path.join(tmpdir, filename)
+    return tmpfile
+
+
+class Dataset():
     logformat = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logfile = util.getTempfile('pygml.log')
+    logfile = getTempfile('pygml.log')
     logging.basicConfig(filename=logfile, level=logging.ERROR, format=logformat)
     logging.debug(dir())
 
@@ -41,7 +53,6 @@ class Dataset():
             return False
 
         def postprocessor(path, key, value):
-
             # remove wfs namespace
             key = key.replace('wfs:', '')
 
@@ -52,23 +63,20 @@ class Dataset():
             if not is_geometry(key):
                 return key, value
 
-
         features = {}
-        f = open(filename, mode='r')
+        f = open(filename, mode='rb')
         logging.info('Open file %s' % filename)
         features = xmltodict.parse(f, postprocessor=postprocessor)
 
         # logging.info(json.dumps(features, indent=3))
-
         logging.debug('Container type(%s)' % str(type(features)))
-        logging.debug('Container %s' % features.keys()[0])
+        logging.debug('Container %s' % [features.keys()][0])
 
         # convert single feature (count=1 or maxFeatures=1) to list
         def prepare(features):
             if type(features) == OrderedDict:
                 return [features]
             return features
-
 
         self.__features = None
 
@@ -86,7 +94,6 @@ class Dataset():
                     self.__features.extend(features['FeatureCollection']['additionalObjects']['SimpleFeatureCollection']['member'])
                 except KeyError:
                     pass
-
             # GML 3.1
             if 'featureMembers' in features['FeatureCollection']:
                 list = []
@@ -96,16 +103,12 @@ class Dataset():
                         dict[key] = value
                         list.append(dict)
                 self.__features = list
-
             # GML 2.0
             if 'featureMember' in features['FeatureCollection']:
                 self.__features = prepare(features['FeatureCollection']['featureMember'])
 
-
-
         if not self.__features:
             raise GmlException('Unsupported GML-Container!')
-
 
         logging.debug('Container type(%s)' % str(type(self.__features)))
 
@@ -113,24 +116,23 @@ class Dataset():
             logging.info('Resolving xlink:href references')
             self.__resolve(self.__features)
 
-
     def getFeatures(self):
         logging.debug('getFeatures()')
         logging.debug('type(getFeatures()) = %s' % type(self.__features))
         return self.__features
 
+    #TODO: auf das erste tupe zugreifen und prüfen ob @fid oder @gml:id enthalten ist ('@gml:id','Name')
+    #        - scheint nicht ordnungsgemäß auf das dict zuzugreifen
     def getFeature(self, id):
-
         logging.debug('getFeature(%s)' % id)
-
         features = self.getFeatures()
+        
         for feature in features:
             for gml_id in ['@fid', '@gml:id']:
-                if gml_id in feature.values()[0]:
-                    if feature.values()[0][gml_id] == id:
+                if gml_id in list(feature.values())[0]:
+                    if list(feature.values())[0][gml_id] == id:
                         return feature
         return None
-
 
     def __resolve(self, value):
         if type(value) == OrderedDict:

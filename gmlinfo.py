@@ -20,15 +20,16 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QObject, SIGNAL, QTimer
-from PyQt4.QtGui import QAction, QIcon, QMessageBox, QTreeWidgetItem, QColor
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QTimer
+from PyQt5.QtWidgets import QAction, QMessageBox, QTreeWidgetItem
+from PyQt5.QtGui import QIcon, QColor
 # Initialize Qt resources from file resources.py
-import resources
+from .resources import *
 # Import the code for the dialog
-from gmlinfo_dialog import ComplexGmlInfoDialog
+from .gmlinfo_dialog import ComplexGmlInfoDialog
 import os.path
 
-from extlib.pygml import pygml, util
+from .pygml import pygml, util
 from collections import OrderedDict
 import logging
 
@@ -204,7 +205,7 @@ class ComplexGmlInfo:
     def run(self):
         self.dlg.treeWidget.setHeaderHidden(True)
         self.displayFeatureInfo()
-        QObject.connect(self.dlg.lineEdit, SIGNAL("textChanged(QString)"), self.resetTimer)
+        self.dlg.lineEdit.textChanged.connect(self.resetTimer)
         self.q = self.dlg.lineEdit.text()
         self.timer = QTimer()
         self.timer.setInterval(500)
@@ -271,17 +272,17 @@ class ComplexGmlInfo:
         item.setExpanded(True)
         if type(value) is OrderedDict:
             for key, val in sorted(value.items()):
-                if type(val) is unicode:
+                if type(val) is str:
                     if '@xmlns' not in key: # hack
                         child = QTreeWidgetItem()
-                        text = unicode(key + " '" + val + "'")
-                        child.setTextColor(0, self.getQColor(text))
+                        text = str(key + " '" + val + "'")
+                        child.setForeground(0, self.getQColor(text))
                         child.setText(0, text)
                         item.addChild(child)
                 else:
                     child = QTreeWidgetItem()
-                    text = unicode(key)
-                    #child.setTextColor(0, self.getQColor(text))
+                    text = str(key)
+                    #child.setForeground(0, self.getQColor(text))
                     child.setText(0, text)
                     item.addChild(child)
                     self.fill_item(child, val)
@@ -296,7 +297,7 @@ class ComplexGmlInfo:
                     child.setText(0, '[' + str(value.index(val)) +']')
                     self.fill_item(child, val)
                 else:
-                    child.setText(0, unicode(val))
+                    child.setText(0, str(val))
                     child.setExpanded(True)
         else:
             child = QTreeWidgetItem()
@@ -324,7 +325,7 @@ class ComplexGmlInfo:
     # search inside QTreeWidget
     def updateFeatureInfo(self):
         self.displayFeatureInfo()
-        query = unicode(self.dlg.lineEdit.text())
+        query = str(self.dlg.lineEdit.text())
         if query and len(query) >= 3:
             root_item = self.dlg.treeWidget.invisibleRootItem()
             self.removeChildren(root_item, query)
