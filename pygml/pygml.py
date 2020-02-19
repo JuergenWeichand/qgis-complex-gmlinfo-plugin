@@ -14,6 +14,7 @@ __copyright__ = 'Copyright 2015 Jürgen Weichand'
 from collections import OrderedDict
 import logging
 import os
+import re
 import tempfile
 import json
 
@@ -43,14 +44,12 @@ class Dataset():
     logfile = getTempfile('pygml.log')
     logging.basicConfig(filename=logfile, level=logging.ERROR, format=logformat)
     logging.debug(dir())
+    geometry_name_matcher = re.compile('(?:^|:)(?:geometry|position|the_geom)', re.IGNORECASE)
 
     def __init__(self, filename, resolve_xlink_href=True):
 
         def is_geometry(key):
-            for name in ['geometry', 'position', 'the_geom']:
-                if name in key.lower():
-                    return True
-            return False
+            return self.geometry_name_matcher.search(key) != None
 
         def postprocessor(path, key, value):
             # remove wfs namespace
