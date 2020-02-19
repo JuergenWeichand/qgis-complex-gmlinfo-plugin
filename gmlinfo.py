@@ -198,7 +198,7 @@ class ComplexGmlInfo:
         del self.toolbar
 
     def about(self):
-        infoString = "<table><tr><td colspan=\"2\"><b>Complex GML Info 0.4</b></td></tr><tr><td colspan=\"2\"></td></tr><tr><td>Author:</td><td>J&uuml;rgen Weichand</td></tr><tr><td>Mail:</td><td><a href=\"mailto:juergen@weichand.de\">juergen@weichand.de</a></td></tr><tr><td>Website:</td><td><a href=\"http://www.weichand.de\">http://www.weichand.de</a></td></tr></table>"
+        infoString = "<table><tr><td colspan=\"3\"><b>Complex GML Info 0.5</b></td></tr><tr><td colspan=\"3\"></td></tr><tr><td rowspan=\"3\">Authors:</td><td>J&uuml;rgen Weichand</td><td><a href=\"mailto:juergen@weichand.de\">juergen@weichand.de</a></td></tr><tr><td colspan=\"2\">Tim Vinving</td></tr><tr><td rowspan=\"3\">Authors:</td><td>Edward Nash</td><td><a href=\"mailto:e.nash@dvz-mv.de\">e.nash@dvz-mv.de</a></td></tr><tr><td>Website:</td><td><a href=\"http://github.com/qgisinspiretools/qgis-complex-gmlinfo-plugin\">http://github.com/qgisinspiretools/qgis-complex-gmlinfo-plugin</a></td></tr></table>"
         QMessageBox.information(self.iface.mainWindow(), "About Complex GML Info", infoString)
 
     def run(self):
