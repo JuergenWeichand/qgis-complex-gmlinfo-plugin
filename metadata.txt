@@ -11,8 +11,8 @@ name=Complex GML Info
 qgisMinimumVersion=3.0
 description=Display the featureinfo of complex GML featuretypes.
 version=0.5
-author=Juergen Weichand
-email=juergen@weichand.de
+author=Juergen Weichand, Tim Vinzing, Edward Nash
+email=juergen@weichand.de, e.nash@dvz-mv.de
 
 about=Display the featureinfo of complex GML featuretypes.
 
