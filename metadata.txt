@@ -16,8 +16,8 @@ email=juergen@weichand.de
 
 about=Display the featureinfo of complex GML featuretypes.
 
-tracker=http://github.com/JuergenWeichand/qgis-complex-gmlinfo-plugin/issues
-repository=http://github.com/JuergenWeichand/qgis-complex-gmlinfo-plugin
+tracker=http://github.com/qgisinspiretools/qgis-complex-gmlinfo-plugin/issues
+repository=http://github.com/qgisinspiretools/qgis-complex-gmlinfo-plugin
 # End of mandatory metadata
 
 # Recommended items:
@@ -28,7 +28,7 @@ repository=http://github.com/JuergenWeichand/qgis-complex-gmlinfo-plugin
 # Tags are comma separated with spaces allowed
 tags=GML, GML 2.0, GML 3.1, GML 3.2, INSPIRE, WFS
 
-homepage=http://www.weichand.de
+homepage=http://github.com/qgisinspiretools/qgis-complex-gmlinfo-plugin
 category=Vector
 icon=icon.png
 # experimental flag
