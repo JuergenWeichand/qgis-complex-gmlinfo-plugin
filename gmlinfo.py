@@ -231,7 +231,7 @@ class ComplexGmlInfo:
             return
 
         # layer must be GML
-        if layer.storageType() != 'GML':
+        if layer.storageType() != 'GML' and layer.storageType() != 'NAS':
             QMessageBox.critical(self.dlg, 'Error', u'Please activate a GML layer - the active layer is not GML!')
             return
 
