@@ -20,17 +20,20 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QObject, SIGNAL, QTimer
-from PyQt4.QtGui import QAction, QIcon, QMessageBox, QTreeWidgetItem, QColor
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QTimer
+from PyQt5.QtWidgets import QAction, QMessageBox, QTreeWidgetItem
+from PyQt5.QtGui import QIcon, QColor
 # Initialize Qt resources from file resources.py
-import resources
+from .resources import *
 # Import the code for the dialog
-from gmlinfo_dialog import ComplexGmlInfoDialog
+from .gmlinfo_dialog import ComplexGmlInfoDialog
 import os.path
 
-from extlib.pygml import pygml, util
+from .pygml import pygml, util
 from collections import OrderedDict
 import logging
+
+from .selectTool import SelectTool
 
 
 class ComplexGmlInfo:
@@ -49,7 +52,7 @@ class ComplexGmlInfo:
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
-        locale = QSettings().value('locale/userLocale')[0:2]
+        locale = str(QSettings().value('locale/userLocale'))[0:2]
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
@@ -184,7 +187,6 @@ class ComplexGmlInfo:
             add_to_toolbar=None,
             parent=None)
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -195,22 +197,19 @@ class ComplexGmlInfo:
         # remove the toolbar
         del self.toolbar
 
-
     def about(self):
-        infoString = "<table><tr><td colspan=\"2\"><b>Complex GML Info 0.4</b></td></tr><tr><td colspan=\"2\"></td></tr><tr><td>Author:</td><td>J&uuml;rgen Weichand</td></tr><tr><td>Mail:</td><td><a href=\"mailto:juergen@weichand.de\">juergen@weichand.de</a></td></tr><tr><td>Website:</td><td><a href=\"http://www.weichand.de\">http://www.weichand.de</a></td></tr></table>"
+        infoString = "<table><tr><td colspan=\"3\"><b>Complex GML Info 0.5</b></td></tr><tr><td colspan=\"3\"></td></tr><tr><td rowspan=\"3\">Authors:</td><td>J&uuml;rgen Weichand</td><td><a href=\"mailto:juergen@weichand.de\">juergen@weichand.de</a></td></tr><tr><td colspan=\"2\">Tim Vinving</td></tr><tr><td rowspan=\"3\">Authors:</td><td>Edward Nash</td><td><a href=\"mailto:e.nash@dvz-mv.de\">e.nash@dvz-mv.de</a></td></tr><tr><td>Website:</td><td><a href=\"http://github.com/qgisinspiretools/qgis-complex-gmlinfo-plugin\">http://github.com/qgisinspiretools/qgis-complex-gmlinfo-plugin</a></td></tr></table>"
         QMessageBox.information(self.iface.mainWindow(), "About Complex GML Info", infoString)
-
 
     def run(self):
         self.dlg.treeWidget.setHeaderHidden(True)
         self.displayFeatureInfo()
-        QObject.connect(self.dlg.lineEdit, SIGNAL("textChanged(QString)"), self.resetTimer)
+        self.dlg.lineEdit.textChanged.connect(self.resetTimer)
         self.q = self.dlg.lineEdit.text()
         self.timer = QTimer()
         self.timer.setInterval(500)
         self.timer.start()
         self.timer.timeout.connect(self.checkUpdateFeatureInfo)
-
 
     def resetTimer(self):
         self.timer.stop()
@@ -224,18 +223,28 @@ class ComplexGmlInfo:
             self.timer.start()
 
     def displayFeatureInfo(self):
-
         layer = self.iface.activeLayer()
 
         # layer must be activated
         if not layer:
-            QMessageBox.critical(self.dlg, 'Error', u'Please activate GML layer!')
+            QMessageBox.critical(self.dlg, 'Error', u'Please activate a GML layer - no layer is active!')
             return
 
         # layer must be GML
-        if layer.storageType() != 'GML':
-            QMessageBox.critical(self.dlg, 'Error', u'Please activate GML layer!')
+        if not (hasattr(layer, 'storageType') and (layer.storageType() == 'GML' or layer.storageType() == 'NAS')):
+            QMessageBox.critical(self.dlg, 'Error', u'Please activate a GML layer - the active layer is not GML!')
             return
+
+        self.previous_map_tool = self.iface.mapCanvas().mapTool()
+
+        if not layer.selectedFeatures():
+            tool = SelectTool(self.iface, self.show_Info)
+            self.iface.mapCanvas().setMapTool(tool)
+        else:
+            self.show_Info()
+
+    def show_Info(self):
+        layer = self.iface.activeLayer()
 
         filename = layer.dataProvider().dataSourceUri().split('|')[0]
 
@@ -258,30 +267,34 @@ class ComplexGmlInfo:
 
         features = OrderedDict()
         i = 0
+
         for feature in layer.selectedFeatures():
             if feature.attribute('gml_id'):
                 i+=1
                 gml_id = feature.attribute('gml_id')
                 features['Selected feature [' + str(i) +']'] = gml.getFeature(gml_id)
+
         self.fill_widget(self.dlg.treeWidget, features)
 
+        if self.previous_map_tool:
+            self.iface.mapCanvas().setMapTool(self.previous_map_tool)
 
     # based on http://stackoverflow.com/questions/21805047/qtreewidget-to-mirror-python-dictionary
     def fill_item(self, item, value):
         item.setExpanded(True)
         if type(value) is OrderedDict:
             for key, val in sorted(value.items()):
-                if type(val) is unicode:
+                if type(val) is str:
                     if '@xmlns' not in key: # hack
                         child = QTreeWidgetItem()
-                        text = unicode(key + " '" + val + "'")
-                        child.setTextColor(0, self.getQColor(text))
+                        text = str(key + " '" + val + "'")
+                        child.setForeground(0, self.getQColor(text))
                         child.setText(0, text)
                         item.addChild(child)
                 else:
                     child = QTreeWidgetItem()
-                    text = unicode(key)
-                    #child.setTextColor(0, self.getQColor(text))
+                    text = str(key)
+                    #child.setForeground(0, self.getQColor(text))
                     child.setText(0, text)
                     item.addChild(child)
                     self.fill_item(child, val)
@@ -296,19 +309,16 @@ class ComplexGmlInfo:
                     child.setText(0, '[' + str(value.index(val)) +']')
                     self.fill_item(child, val)
                 else:
-                    child.setText(0, unicode(val))
+                    child.setText(0, str(val))
                     child.setExpanded(True)
         else:
             child = QTreeWidgetItem()
             child.setText(0, str(value))
             item.addChild(child)
 
-
     def fill_widget(self, widget, value):
         widget.clear()
         self.fill_item(widget.invisibleRootItem(), value)
-
-
 
     # colorize attributes
     def getQColor(self, text):
@@ -317,14 +327,13 @@ class ComplexGmlInfo:
                 return QColor('lightgrey')
         for indicator in ['gml:id', 'localid', 'identifier', 'xlink:href', 'xlink:type', 'namespace', 'codespace']:
             if indicator in text.lower():
-                return QColor('darkslategray')
-        return QColor('red')
-
+                return QColor(244,134,66)
+        return QColor('green')
 
     # search inside QTreeWidget
     def updateFeatureInfo(self):
         self.displayFeatureInfo()
-        query = unicode(self.dlg.lineEdit.text())
+        query = str(self.dlg.lineEdit.text())
         if query and len(query) >= 3:
             root_item = self.dlg.treeWidget.invisibleRootItem()
             self.removeChildren(root_item, query)

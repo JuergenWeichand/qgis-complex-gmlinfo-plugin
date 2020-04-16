@@ -8,16 +8,16 @@
 
 [general]
 name=Complex GML Info
-qgisMinimumVersion=2.0
+qgisMinimumVersion=3.0
 description=Display the featureinfo of complex GML featuretypes.
-version=0.4
-author=Juergen Weichand
-email=juergen@weichand.de
+version=0.5
+author=Juergen Weichand, Tim Vinzing, Edward Nash
+email=e.nash@dvz-mv.de
 
 about=Display the featureinfo of complex GML featuretypes.
 
-tracker=http://github.com/JuergenWeichand/qgis-complex-gmlinfo-plugin/issues
-repository=http://github.com/JuergenWeichand/qgis-complex-gmlinfo-plugin
+tracker=http://github.com/qgisinspiretools/qgis-complex-gmlinfo-plugin/issues
+repository=http://github.com/qgisinspiretools/qgis-complex-gmlinfo-plugin
 # End of mandatory metadata
 
 # Recommended items:
@@ -28,7 +28,7 @@ repository=http://github.com/JuergenWeichand/qgis-complex-gmlinfo-plugin
 # Tags are comma separated with spaces allowed
 tags=GML, GML 2.0, GML 3.1, GML 3.2, INSPIRE, WFS
 
-homepage=http://www.weichand.de
+homepage=http://github.com/qgisinspiretools/qgis-complex-gmlinfo-plugin
 category=Vector
 icon=icon.png
 # experimental flag

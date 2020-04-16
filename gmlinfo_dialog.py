@@ -23,13 +23,11 @@
 
 import os
 
-from PyQt4 import QtGui, uic
+from PyQt5 import uic
+from PyQt5.QtWidgets import *
+from .gmlinfo_dialog_base import Ui_ComplexGmlInfoDialogBase
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'gmlinfo_dialog_base.ui'))
-
-
-class ComplexGmlInfoDialog(QtGui.QDialog, FORM_CLASS):
+class ComplexGmlInfoDialog(QDialog, Ui_ComplexGmlInfoDialogBase):
     def __init__(self, parent=None):
         """Constructor."""
         super(ComplexGmlInfoDialog, self).__init__(parent)
