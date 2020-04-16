@@ -8,6 +8,7 @@ __pycache__/
 
 # Compiled resources
 resources.py
+gmlinfo_dialog_base.py
 
 # C extensions
 *.so
@@ -62,3 +63,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# pb_tool
+zip_build/
