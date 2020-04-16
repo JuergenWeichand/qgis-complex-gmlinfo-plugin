@@ -66,6 +66,7 @@ class Dataset():
         f = open(filename, mode='rb')
         logging.info('Open file %s' % filename)
         features = xmltodict.parse(f, postprocessor=postprocessor)
+        f.close()
 
         # logging.info(json.dumps(features, indent=3))
         logging.debug('Container type(%s)' % str(type(features)))
